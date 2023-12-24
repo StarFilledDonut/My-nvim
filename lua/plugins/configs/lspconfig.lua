@@ -41,6 +41,18 @@ M.capabilities.textDocument.completion.completionItem = {
   },
 }
 
+local lspconfig = require "lspconfig"
+
+require("lspconfig").tsserver.setup {
+  cmd = {"typescript-language-server", "--stdio"},
+  filetypes = {"javascript", "typescript"},
+  on_attach = M.on_attach,
+  capabilities = M.capabilities,
+  root_dir = function(fname)
+    return lspconfig.util.root_pattern(".git")(fname) or vim.loop.cwd()
+  end,
+}
+
 require("lspconfig").lua_ls.setup {
   on_attach = M.on_attach,
   capabilities = M.capabilities,
