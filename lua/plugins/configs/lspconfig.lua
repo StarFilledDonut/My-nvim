@@ -7,8 +7,8 @@ local utils = require "core.utils"
 -- export on_attach & capabilities for custom lspconfigs
 
 M.on_attach = function(client, bufnr)
-  client.server_capabilities.documentFormattingProvider = true
-  client.server_capabilities.documentRangeFormattingProvider = true
+  client.server_capabilities.documentFormattingProvider = false
+  client.server_capabilities.documentRangeFormattingProvider = false
 
   utils.load_mappings("lspconfig", { buffer = bufnr })
 
@@ -39,18 +39,6 @@ M.capabilities.textDocument.completion.completionItem = {
       "additionalTextEdits",
     },
   },
-}
-
-local lspconfig = require "lspconfig"
-
-require("lspconfig").tsserver.setup {
-  cmd = {"typescript-language-server", "--stdio"},
-  filetypes = {"javascript", "typescript"},
-  on_attach = M.on_attach,
-  capabilities = M.capabilities,
-  root_dir = function(fname)
-    return lspconfig.util.root_pattern(".git")(fname) or vim.loop.cwd()
-  end,
 }
 
 require("lspconfig").lua_ls.setup {

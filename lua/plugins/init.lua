@@ -141,6 +141,55 @@ local default_plugins = {
   },
 
   {
+    "williamboman/mason-lspconfig.nvim",
+    lazy = false,
+    config = function ()
+      require("mason-lspconfig").setup {}
+      require("mason-lspconfig").setup_handlers {
+        -- The first entry (without a key) will be the default handler
+        -- and will be called for each installed server that doesn't have
+        -- a dedicated handler.
+        function (server_name) -- default handler (optional)
+          require("lspconfig")[server_name].setup {}
+        end,
+      }
+    end
+  },
+
+  {
+    "junnplus/lsp-setup.nvim",
+    dependencies = {
+      "neovim/nvim-lspconfig",
+      "williamboman/mason.nvim",
+      "williamboman/mason-lspconfig.nvim"
+    },
+  },
+
+  {
+    "VonHeikemen/lsp-zero.nvim",
+    branch = "v3.x",
+    config = function()
+      local lspz = require("lsp-zero")
+      local utils = require "core.utils"
+      lspz.on_attach(function (client, bufnr)
+      client.server_capabilities.documentFormattingProvider = false
+      client.server_capabilities.documentRangeFormattingProvider = false
+
+      utils.load_mappings("lspconfig", { buffer = bufnr })
+
+      if client.server_capabilities.signatureHelpProvider then
+        require("nvchad.signature").setup(client)
+      end
+
+      if not utils.load_config().ui.lsp_semantic_tokens and client.supports_method "textDocument/semanticTokens" then
+        client.server_capabilities.semanticTokensProvider = nil
+      end
+        lspz.default_keymaps({buffer = bufnr})
+      end)
+    end,
+  },
+
+  {
     "neovim/nvim-lspconfig",
     init = function()
       require("core.utils").lazy_load "nvim-lspconfig"
