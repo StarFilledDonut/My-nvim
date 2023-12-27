@@ -44,14 +44,51 @@ local default_plugins = {
     end,
   },
 
+  -- Maybe ill use these
+  {"rcarriga/nvim-notify"},
+
+  {"folke/zen-mode.nvim"},
+
+  {"folke/twilight.nvim"},
+
+  {
+    "SmiteshP/nvim-navic",
+    lazy = false,
+    dependencies = {"neovim/nvim-lspconfig"},
+    config = function ()
+      require("nvim-navic").setup{
+        highlight = false,
+        lsp = {
+          auto_attach = true
+        }
+      }
+    end
+  },
+
+  {
+    "utilyre/barbecue.nvim",
+    name = "barbecue",
+    version = "*",
+    dependencies = {
+      "SmiteshP/nvim-navic",
+      "nvim-tree/nvim-web-devicons",
+    },
+    opts = {}
+  },
+
   {
     "nvim-tree/nvim-web-devicons",
     opts = function()
-      return { override = require "nvchad.icons.devicons" }
+      return { override = require "plugins.configs.devicons" }
     end,
     config = function(_, opts)
       dofile(vim.g.base46_cache .. "devicons")
-      require("nvim-web-devicons").setup(opts)
+      require("nvim-web-devicons").setup({
+        opts,
+        color_icons = true,
+        default = true,
+        strict = true
+      })
     end,
   },
 
@@ -120,6 +157,10 @@ local default_plugins = {
     end,
   },
 
+  {
+    "sindrets/diffview.nvim"
+  },
+
   -- lsp stuff
   {
     "williamboman/mason.nvim",
@@ -163,30 +204,6 @@ local default_plugins = {
       "williamboman/mason.nvim",
       "williamboman/mason-lspconfig.nvim"
     },
-  },
-
-  {
-    "VonHeikemen/lsp-zero.nvim",
-    branch = "v3.x",
-    config = function()
-      local lspz = require("lsp-zero")
-      local utils = require "core.utils"
-      lspz.on_attach(function (client, bufnr)
-      client.server_capabilities.documentFormattingProvider = false
-      client.server_capabilities.documentRangeFormattingProvider = false
-
-      utils.load_mappings("lspconfig", { buffer = bufnr })
-
-      if client.server_capabilities.signatureHelpProvider then
-        require("nvchad.signature").setup(client)
-      end
-
-      if not utils.load_config().ui.lsp_semantic_tokens and client.supports_method "textDocument/semanticTokens" then
-        client.server_capabilities.semanticTokensProvider = nil
-      end
-        lspz.default_keymaps({buffer = bufnr})
-      end)
-    end,
   },
 
   {
@@ -247,6 +264,17 @@ local default_plugins = {
     config = function(_, opts)
       require("cmp").setup(opts)
     end,
+  },
+
+  {
+    "onsails/lspkind.nvim",
+    lazy = false,
+    config = function ()
+      require("lspkind").init({
+        mode = "symbol_text",
+        symbol_map = {}
+      })
+    end
   },
 
   {

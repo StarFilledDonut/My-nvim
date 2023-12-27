@@ -14,21 +14,25 @@ local formatting_style = {
   -- default fields order i.e completion word + item.kind + item.kind icons
   fields = field_arrangement[cmp_style] or { "abbr", "kind", "menu" },
 
-  format = function(_, item)
-    local icons = require "nvchad.icons.lspkind"
-    local icon = (cmp_ui.icons and icons[item.kind]) or ""
+  format = require("lspkind").cmp_format({
+    mode = "symbol_text",
 
-    if cmp_style == "atom" or cmp_style == "atom_colored" then
-      icon = " " .. icon .. " "
-      item.menu = cmp_ui.lspkind_text and "   (" .. item.kind .. ")" or ""
-      item.kind = icon
-    else
-      icon = cmp_ui.lspkind_text and (" " .. icon .. " ") or icon
-      item.kind = string.format("%s %s", icon, cmp_ui.lspkind_text and item.kind or "")
-    end
+    before = function(_, item)
+      local icons = require "lspkind"
+      local icon = (cmp_ui.icons and icons[item.kind]) or ""
 
-    return item
-  end,
+      if cmp_style == "atom" or cmp_style == "atom_colored" then
+        icon = " " .. icon .. " "
+        item.menu = cmp_ui.lspkind_text and "   (" .. item.kind .. ")" or ""
+        item.kind = icon
+      else
+        icon = cmp_ui.lspkind_text and (" " .. icon .. " ") or icon
+        item.kind = string.format("%s %s", icon, cmp_ui.lspkind_text and item.kind or "")
+      end
+
+      return item
+    end,
+  })
 }
 
 local function border(hl_name)
@@ -74,7 +78,6 @@ local options = {
     local context = require("cmp.config.context")
     return not(context.in_treesitter_capture("comment") == true or context.in_syntax_group("Comment"))
   end,
-
   formatting = formatting_style,
 
   mapping = {
