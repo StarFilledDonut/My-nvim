@@ -41,6 +41,10 @@ M.capabilities.textDocument.completion.completionItem = {
   },
 }
 
+local null_ls = require("null-ls")
+
+require("lspconfig")null_ls.setup({})
+
 require("lspconfig").lua_ls.setup {
   on_attach = M.on_attach,
   capabilities = M.capabilities,

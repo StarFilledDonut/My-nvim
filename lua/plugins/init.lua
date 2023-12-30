@@ -52,8 +52,26 @@ local default_plugins = {
   {"folke/twilight.nvim"},
 
   {
-    "SmiteshP/nvim-navic",
+    'stevearc/aerial.nvim',
     lazy = false,
+    opts = {},
+    config = function ()
+      require("aerial").setup({
+        on_attach = function(bufnr)
+          vim.keymap.set("n", "{", "<cmd>AerialPrev<CR>", { buffer = bufnr })
+          vim.keymap.set("n", "}", "<cmd>AerialNext<CR>", { buffer = bufnr })
+        end,
+      })
+    end,
+    -- Optional dependencies
+    dependencies = {
+       "nvim-treesitter/nvim-treesitter",
+       "nvim-tree/nvim-web-devicons"
+    },
+  },
+
+  {
+    "SmiteshP/nvim-navic",
     dependencies = {"neovim/nvim-lspconfig"},
     config = function ()
       require("nvim-navic").setup{
@@ -216,10 +234,29 @@ local default_plugins = {
     end,
   },
 
+  {
+    'nvimtools/none-ls.nvim',
+    lazy = false,
+    dependencies = {'nvim-lua/plenary.nvim'},
+    config = function ()
+      local null_ls = require("null-ls")
+      local formatting = null_ls.builtins.formatting
+      -- local diagnostics = null_ls.builtins.diagnostics
+      null_ls.setup({
+        sources = {
+          formatting.black.with({ extra_args = {'--fast'} }),
+          formatting.prettier.with({ extra_args = {
+            '--single-quote', '--jsx-single-quote'
+          }}),
+          -- diagnostics.eslint,
+        }
+      })
+    end
+  },
+
   -- load luasnips + cmp related in insert mode only
   {
     "hrsh7th/nvim-cmp",
-    lazy = false,
     event = "InsertEnter",
     dependencies = {
       {
@@ -272,6 +309,7 @@ local default_plugins = {
     config = function ()
       require("lspkind").init({
         mode = "symbol_text",
+        preset = "codicons",
         symbol_map = {}
       })
     end
